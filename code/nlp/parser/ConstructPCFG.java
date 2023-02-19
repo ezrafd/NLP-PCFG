@@ -73,7 +73,8 @@ public class ConstructPCFG {
     public HashMap<String, HashMap<GrammarRule, Double>> getRules() { return rules; }
 
     public static void main(String[] args) {
-        String filename = "/Users/talmordoch/Desktop/NLP/assign3-starter/example/example.parsed";
+        String filename = "/Users/ezraford/Desktop/School/CS 159/assign3-starter/example/example.parsed";
+        //String filename = "/Users/talmordoch/Desktop/NLP/assign3-starter/example/example.parsed";
         //String filename = "/Users/talmordoch/Desktop/NLP/assign3-starter/data/simple.parsed";
 
 
