@@ -169,7 +169,7 @@ public class ConstructPCFG {
      */
     public void betterBinarizePCFG() {
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter("short.binary.shared.pcfg"));
+            BufferedWriter writer = new BufferedWriter(new FileWriter("simple.binary.shared.pcfg"));
 
             //initializes the prefix and total count
             String prefix = "X";
