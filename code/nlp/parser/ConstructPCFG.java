@@ -78,6 +78,21 @@ public class ConstructPCFG {
         }
     }
 
+    public void binarizePCFG() {
+        //To binarize a rule, start with the leftmost pair of symbols and replace them with a new nonterminal,
+        //not already in your grammar. For this assignment, we’ll use X followed by some number
+        //to represent these new non-terminals. Then, create a new PCFG rule from X to those two symbols
+        //with probability 1.0. Continue this process until the rule is binary
+        for (String key : rules.keySet()) {
+            for (GrammarRule rule : rules.get(key).keySet()){
+                if (rule.getRhs().size() > 2) {
+                    rules.put("X", new HashMap<>());
+                    //rule.getRhs().subList(0,2)
+                }
+            }
+        }
+    }
+
     /**
      * Prints the probabilities of each rule.
      */
@@ -107,5 +122,7 @@ public class ConstructPCFG {
         //pcfg.updateWeight("PP");
 
         pcfg.printProbs();
+
+        pcfg.binarizePCFG();
     }
 }
