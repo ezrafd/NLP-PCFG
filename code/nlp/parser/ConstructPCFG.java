@@ -19,8 +19,8 @@ public class ConstructPCFG {
      */
     public ConstructPCFG(String filename) {
         // initialize counts & rules
-        counts = new HashMap<String, Double>();
-        rules = new HashMap<String, HashMap<GrammarRule, Double>>();
+        counts = new HashMap<>();
+        rules = new HashMap<>();
 
         // create bufferedReader, go through every line, and update the counts
         try {
@@ -163,7 +163,76 @@ public class ConstructPCFG {
 
     }
 
+    /**
+     * Binarizes the PCFG similarly to binarizePCFG(), but without duplicate intermediary rules with the
+     * same right hand side.
+     */
+    public void betterBinarizePCFG() {
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter("short.binary.shared.pcfg"));
 
+            //initializes the prefix and total count
+            String prefix = "X";
+            int totalCount = 1;
+
+            //initialize memory
+            HashMap<ArrayList<String>, String> memory = new HashMap<>();
+
+            //goes over all String representations of rules
+            for (String key : rules.keySet()) {
+                for (GrammarRule rule : rules.get(key).keySet()) {
+
+                    //creates a variabloe for the left and right hand sides
+                    String lhs = rule.getLhs();
+                    ArrayList<String> rhs = rule.getRhs();
+
+                    //enters this section if needs to be binarized
+                    if (rhs.size() > 2) {
+
+                        String prev = rhs.get(0);
+
+                        // Binarize rule and write the new rule to the file
+                        for (int i = 1; i < rhs.size() - 1; i++) {
+                            String new_lhs = prefix + totalCount;
+                            ArrayList<String> new_rhs = new ArrayList<>();
+                            new_rhs.add(prev);
+                            new_rhs.add(rhs.get(i));
+
+                            // If already seen the rhs point to old rule instead of generating a new rule
+                            if (memory.containsKey(new_rhs)) {
+                                prev = memory.get(new_rhs);
+                            } else {
+                                memory.put(new_rhs, new_lhs);
+                                GrammarRule g = new GrammarRule(new_lhs, new_rhs, 1.0);
+                                writer.write(g.toString());
+                                writer.newLine();
+                                totalCount++;
+                                prev = new_lhs;
+                            }
+                        }
+
+                        //writes the rule to the file for the last case
+                        ArrayList<String> new_rhs = new ArrayList<>();
+                        new_rhs.add(prev);
+                        new_rhs.add(rhs.get(rhs.size() - 1));
+                        GrammarRule g2 = new GrammarRule(lhs, new_rhs, rule.getWeight());
+                        writer.write(g2.toString());
+                        writer.newLine();
+
+                    // write rule to file if already binary
+                    } else {
+                        writer.write(rule.toString());
+                        writer.newLine();
+                    }
+
+                }
+            }
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
 
     /**
      * Generates the file.
@@ -187,24 +256,30 @@ public class ConstructPCFG {
         }
     }
 
-
+    /**
+     * Get the counts hashmap
+     *
+     * @return the counts hashmap for the pcfg
+     */
     public HashMap<String, Double> getCounts() { return counts; }
 
+    /**
+     * Get the rules hashmap
+     *
+     * @return the rules hashmap for the pcfg
+     */
     public HashMap<String, HashMap<GrammarRule, Double>> getRules() { return rules; }
 
-    public static void main(String[] args) {
-        //String filename = "/Users/ezraford/git/assign3-starter/example/example.parsed";
-        String filename = "/Users/talmordoch/Desktop/NLP/assign3-starter/data/short.parsed";
-        //String filename = "/Users/talmordoch/Desktop/NLP/assign3-starter/data/simple.parsed";
-
-        ConstructPCFG pcfg = new ConstructPCFG(filename);
-
-        //System.out.println(pcfg.getCounts());
-        //System.out.println(pcfg.getRules());
-        //pcfg.updateWeight("PP");
-
-        pcfg.binarizePCFG();
-        //pcfg.printProbs();
-
-    }
+//    public static void main(String[] args) {
+//        String filename = "/Users/ezraford/git/assign3-starter/data/simple.parsed";
+//        String filename = "/Users/talmordoch/Desktop/NLP/assign3-starter/data/short.parsed";
+//        String filename = "/Users/talmordoch/Desktop/NLP/assign3-starter/data/simple.parsed";
+//
+//        ConstructPCFG pcfg = new ConstructPCFG(filename);
+//
+//        pcfg.binarizePCFG();
+//        pcfg.betterBinarizePCFG();
+//        pcfg.printProbs();
+//
+//    }
 }
